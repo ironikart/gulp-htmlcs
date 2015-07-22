@@ -1,0 +1,37 @@
+{
+  "name": "gulp-htmlcs",
+  "version": "0.0.1",
+  "description": "Gulp plugin for HTML Code Sniffer",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --reporter spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ironikart/gulp-htmlcs.git"
+  },
+  "keywords": [
+    "gulp",
+    "htmlcs"
+  ],
+  "author": "Anthony Barnes",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ironikart/gulp-htmlcs/issues"
+  },
+  "homepage": "https://github.com/ironikart/gulp-htmlcs#readme",
+  "dependencies": {
+    "HTML_CodeSniffer": "git+https://github.com/ironikart/HTML_CodeSniffer.git",
+    "chalk": "^1.1.0",
+    "gulp-util": "^3.0.6",
+    "merge": "^1.2.0",
+    "phantomjs": "^1.9.17",
+    "through2": "^2.0.0"
+  },
+  "devDependencies": {
+    "chai": "^3.2.0",
+    "gulp": "^3.9.0",
+    "mocha": "^2.2.5",
+    "rimraf": "^2.4.2"
+  }
+}
