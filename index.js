@@ -34,8 +34,6 @@ module.exports = function(opts) {
             output += data.toString();
         });
 
-        child.stdout.pipe(fs.createWriteStream('output.json'));
-
         child.on('exit', function() {
             reports[file.path] = JSON.parse(output);
             lastReport = reports[file.path];
