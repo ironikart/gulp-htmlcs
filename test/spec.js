@@ -50,6 +50,21 @@ describe('gulp-htmlcs', function() {
             }.bind(this));
     });
 
+    it('processes a larger amount of HTML', function(done) {
+        this.timeout(8000);
+        gulp.src(path.join(fixtures, 'large.html'))
+            .pipe(this.htmlcs())
+            .resume()
+            .on('finish', function() {
+                var report = this.htmlcs.getLastReport();
+                expect(report).not.to.be.equal(null);
+                // expect(report.length).to.be.equal(4);
+                // var errors = this.htmlcs.getLastReport(['ERROR']);
+                // expect(errors.length).to.be.equal(3);
+                done();
+            }.bind(this));
+    });
+
     it('can report', function(done) {
         this.timeout(8000);
         gulp.src(path.join(fixtures, 'fail.html'))

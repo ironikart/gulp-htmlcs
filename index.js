@@ -1,5 +1,6 @@
 'use strict';
 var path = require('path');
+var fs = require('fs');
 var through = require('through2');
 var spawn = require('child_process').spawn;
 var merge = require('merge');
@@ -29,10 +30,11 @@ module.exports = function(opts) {
         var child = spawn(phantomCLI, args);
         var output = '';
 
-        child.stdout.pipe(through(function(chunk, encrypt, cb) {
-            output += chunk.toString();
-            cb(null, chunk);
-        }));
+        child.stdout.on('data', function(data) {
+            output += data.toString();
+        });
+
+        child.stdout.pipe(fs.createWriteStream('output.json'));
 
         child.on('exit', function() {
             reports[file.path] = JSON.parse(output);
