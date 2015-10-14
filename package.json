@@ -10,6 +10,9 @@
     "type": "git",
     "url": "git+https://github.com/ironikart/gulp-htmlcs.git"
   },
+  "bin": {
+    "htmlcs": "bin/index.js"
+  },
   "keywords": [
     "gulp",
     "htmlcs"
