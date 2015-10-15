@@ -7,40 +7,70 @@ var merge = require('merge');
 var chalk = require('chalk');
 var gutil = require('gulp-util');
 var phantomCLI = path.resolve(__dirname, './node_modules/phantomjs/bin/phantomjs');
-var htmlcsRunner = path.resolve(__dirname, './node_modules/HTML_CodeSniffer/Contrib/PhantomJS/HTMLCS_Run.js');
+var run = path.resolve(__dirname, './lib/run.js');
 
 var reports = {};
 var lastReport = [];
 
 module.exports = function(opts) {
     opts = merge({
-        ignoreSSL: true,
-        standard:  'WCAG2AA'
+        ignoreSSL:   true,
+        webSecurity: false,
+        standard:    'WCAG2AA',
+        verbose:     false
     }, opts);
 
     return through.obj(function(file, enc, next) {
+        var running = true;
         var args = [
             '--ignore-ssl-errors=' + opts.ignoreSSL,
-            htmlcsRunner,
+            '--web-security=' + opts.webSecurity,
+            run,
             file.path,
-            opts.standard,
-            'json'
+            opts.standard
         ];
+
+        if (opts.verbose) {
+            gutil.log('Running PhantomJS', phantomCLI, args);
+        }
 
         var child = spawn(phantomCLI, args);
         var output = '';
 
+        var timeout = 60;
+        setTimeout(function() {
+            if (running) {
+                gutil.log(chalk.red('HTMLCS timeout ('+timeout+' seconds)'), file.path);
+                child.kill();
+            }
+        }, timeout*1000);
+
         child.stdout.on('data', function(data) {
+            if (opts.verbose) {
+                gutil.log('received data:', data.toString().length, 'bytes');
+            }
             output += data.toString();
         });
 
+        child.stderr.on('data', function(data) {
+            console.log(chalk.red(data.toString()));
+        });
+
         child.on('exit', function() {
-            reports[file.path] = JSON.parse(output);
-            lastReport = reports[file.path];
-            file.htmlcs = {
-                opts:   opts,
-                report: reports[file.path]
-            };
+            running = false;
+            try {
+                reports[file.path] = JSON.parse(output);
+                lastReport = reports[file.path];
+                file.htmlcs = {
+                    opts:   opts,
+                    report: reports[file.path]
+                };
+            } catch(e) {
+                console.log(chalk.red(e.message));
+                console.log(chalk.red(e.stack));
+                console.log(chalk.red('Writing temporary output to htmlcs-debug.log'));
+                fs.writeFileSync(path.join(process.cwd(), 'htmlcs-debug.log'), output);
+            }
             this.push(file);
             next();
         }.bind(this));
@@ -50,7 +80,7 @@ module.exports = function(opts) {
 module.exports.getLastReport = function(filter) {
     var report = lastReport;
     if (filter) {
-        report = lastReport.filter(function(item){
+        report.messages = lastReport.messages.filter(function(item){
             return filter.indexOf(item.type) !== -1;
         });
     }
@@ -63,7 +93,7 @@ module.exports.reporter = function(opts) {
     }, opts);
     return through.obj(function(file, enc, next) {
         var summary = {};
-        file.htmlcs.report.forEach(function(item) {
+        file.htmlcs.report.messages.forEach(function(item) {
             var key = item.type + 'S';
             if (!summary.hasOwnProperty(key)) {
                 summary[key] = 0;
@@ -71,10 +101,11 @@ module.exports.reporter = function(opts) {
             summary[key] += 1;
         });
 
-        gutil.log(chalk.red(summary.ERRORS) + ' error' + (summary.ERRORS > 1 || summary.ERRORS < 1 ? 's' : '') +
+        gutil.log(chalk.red(summary.ERRORS) + ' sniff error' +
+            (summary.ERRORS > 1 || summary.ERRORS < 1 ? 's' : '') +
             ' found in:', chalk.magenta(file.path));
 
-        file.htmlcs.report.forEach(function(item) {
+        file.htmlcs.report.messages.forEach(function(item) {
             if (!opts.filter || opts.filter.indexOf(item.type) !== -1) {
                 console.log(
                     item.type + ': ' +
@@ -83,6 +114,16 @@ module.exports.reporter = function(opts) {
                 console.log('  ' + item.outerHTML);
             }
         });
+
+        if (file.htmlcs.report.errors.length) {
+            gutil.log(chalk.red(file.htmlcs.report.errors.length) + ' runtime error' +
+                (file.htmlcs.report.errors.length > 1 || file.htmlcs.report.errors.length < 1 ? 's' : '') +
+            ' found in:', chalk.magenta(file.path));
+            file.htmlcs.report.errors.forEach(function(error) {
+                console.log(chalk.red(error.msg));
+                console.log(chalk.red(error.trace));
+            });
+        }
 
         next();
     });
