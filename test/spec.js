@@ -7,6 +7,7 @@ var gulp = require('gulp');
 var rimraf = require('rimraf');
 var path = require('path');
 var fs = require('fs');
+var child = require('child_process');
 
 describe('gulp-htmlcs', function() {
     var fixtures = path.join(__dirname, 'fixtures');
@@ -21,7 +22,7 @@ describe('gulp-htmlcs', function() {
     });
 
     it('processes passing HTML', function(done) {
-        this.timeout(30*1000);
+        this.timeout(10*1000);
         gulp.src(path.join(fixtures, 'pass.html'))
             .pipe(this.htmlcs())
             .resume()
@@ -36,7 +37,7 @@ describe('gulp-htmlcs', function() {
     });
 
     it('processes failing HTML', function(done) {
-        this.timeout(30*1000);
+        this.timeout(10*1000);
         gulp.src(path.join(fixtures, 'fail.html'))
             .pipe(this.htmlcs())
             .resume()
@@ -51,7 +52,7 @@ describe('gulp-htmlcs', function() {
     });
 
     it('processes a larger amount of HTML', function(done) {
-        this.timeout(30*1000);
+        this.timeout(20*1000);
         gulp.src(path.join(fixtures, 'large.html'))
             .pipe(this.htmlcs())
             .resume()
@@ -64,7 +65,7 @@ describe('gulp-htmlcs', function() {
     });
 
     it('can report', function(done) {
-        this.timeout(30*1000);
+        this.timeout(10*1000);
         gulp.src(path.join(fixtures, 'fail.html'))
             .pipe(this.htmlcs())
             .pipe(this.htmlcs.reporter())
@@ -75,5 +76,16 @@ describe('gulp-htmlcs', function() {
                 expect(report.messages.length).to.be.equal(3);
                 done();
             }.bind(this));
+    });
+
+    it('can be run as an executable', function(done) {
+        this.timeout(10*10000)
+        var pkg = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../package.json'), {encoding: 'utf8'}));
+        var binPath = path.resolve(__dirname, '../', pkg.bin[Object.keys(pkg.bin).shift()]);
+        child.execFile(binPath, [path.resolve(__dirname, '../test/fixtures/pass.html')], {}, function(err, stdout, stderr) {
+            expect(err).to.be.equal(null);
+            expect(stdout).to.contain('NOTICE: WCAG2AA Principle2 Guideline2_4');
+            done();
+        });
     });
 });

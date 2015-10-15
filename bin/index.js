@@ -17,5 +17,10 @@ if (!args[1]) {
     console.log('Parsing', chalk.yellow(args[1]));
     gulp.src(args[1])
         .pipe(htmlcs())
-        .pipe(htmlcs.reporter());
+        .pipe(htmlcs.reporter({
+            showTrace: false
+        }))
+        .on('finish', function(){
+            process.exit(0);
+        });
 }

@@ -89,10 +89,20 @@ module.exports.getLastReport = function(filter) {
 
 module.exports.reporter = function(opts) {
     opts = merge({
-        filter: null
+        filter:    null,
+        showTrace: false
     }, opts);
     return through.obj(function(file, enc, next) {
         var summary = {};
+
+        if (file.htmlcs.report.hasOwnProperty('error')) {
+            console.log(chalk.red('ERROR [PhantomJS runtime]: '+file.htmlcs.report.error.msg), file.path);
+            if (opts.showTrace) {
+                console.log(file.htmlcs.report.error.trace);
+            }
+            return next();
+        }
+
         file.htmlcs.report.messages.forEach(function(item) {
             var key = item.type + 'S';
             if (!summary.hasOwnProperty(key)) {
@@ -101,9 +111,11 @@ module.exports.reporter = function(opts) {
             summary[key] += 1;
         });
 
-        gutil.log(chalk.red(summary.ERRORS) + ' sniff error' +
-            (summary.ERRORS > 1 || summary.ERRORS < 1 ? 's' : '') +
-            ' found in:', chalk.magenta(file.path));
+        if (summary.ERRORS) {
+            gutil.log(chalk.red(summary.ERRORS) + ' sniff error' +
+                (summary.ERRORS > 1 || summary.ERRORS < 1 ? 's' : '') +
+                ' found in:', chalk.magenta(file.path));
+        }
 
         file.htmlcs.report.messages.forEach(function(item) {
             if (!opts.filter || opts.filter.indexOf(item.type) !== -1) {
@@ -121,10 +133,13 @@ module.exports.reporter = function(opts) {
             ' found in:', chalk.magenta(file.path));
             file.htmlcs.report.errors.forEach(function(error) {
                 console.log(chalk.red(error.msg));
-                console.log(chalk.red(error.trace));
+                if (opts.showTrace) {
+                    console.log(error.trace);
+                }
             });
         }
 
+        this.push(file);
         next();
     });
 };
