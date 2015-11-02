@@ -79,7 +79,7 @@ describe('gulp-htmlcs', function() {
     });
 
     it('can be run as an executable', function(done) {
-        this.timeout(10*10000)
+        this.timeout(10*10000);
         var pkg = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../package.json'), {encoding: 'utf8'}));
         var binPath = path.resolve(__dirname, '../', pkg.bin[Object.keys(pkg.bin).shift()]);
         child.execFile(binPath, [path.resolve(__dirname, '../test/fixtures/pass.html')], {}, function(err, stdout, stderr) {
