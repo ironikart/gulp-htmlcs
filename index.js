@@ -6,7 +6,8 @@ var spawn = require('child_process').spawn;
 var merge = require('merge');
 var chalk = require('chalk');
 var gutil = require('gulp-util');
-var phantomCLI = path.resolve(__dirname, './node_modules/phantomjs/bin/phantomjs');
+var phantomDir = path.dirname(path.dirname(require.resolve('phantomjs')));
+var phantomCLI = path.resolve(phantomDir, 'bin/phantomjs');
 var run = path.resolve(__dirname, './lib/run.js');
 
 var reports = {};
