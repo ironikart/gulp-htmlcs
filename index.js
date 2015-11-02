@@ -19,7 +19,7 @@ module.exports = function(opts) {
         webSecurity: false,
         standard:    'WCAG2AA',
         verbose:     false,
-        timeout:     60
+        timeout:     60000
     }, opts);
 
     return through.obj(function(file, enc, next) {
@@ -44,7 +44,7 @@ module.exports = function(opts) {
                 gutil.log(chalk.red('HTMLCS timeout ('+timeout+' seconds)'), file.path);
                 child.kill();
             }
-        }, opts.timeout*1000);
+        }, opts.timeout);
 
         child.stdout.on('data', function(data) {
             if (opts.verbose) {
