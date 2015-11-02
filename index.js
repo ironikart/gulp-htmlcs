@@ -96,6 +96,11 @@ module.exports.reporter = function(opts) {
     return through.obj(function(file, enc, next) {
         var summary = {};
 
+        if (!file.htmlcs.report) {
+            this.push(file);
+            return next();
+        }
+
         if (file.htmlcs.report.hasOwnProperty('error')) {
             console.log(chalk.red('ERROR [PhantomJS runtime]: '+file.htmlcs.report.error.msg), file.path);
             if (opts.showTrace) {
