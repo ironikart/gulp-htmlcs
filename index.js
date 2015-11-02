@@ -41,7 +41,7 @@ module.exports = function(opts) {
 
         setTimeout(function() {
             if (running) {
-                gutil.log(chalk.red('HTMLCS timeout ('+timeout+' seconds)'), file.path);
+                gutil.log(chalk.red('HTMLCS timeout ('+opts.timeout+' seconds)'), file.path);
                 child.kill();
             }
         }, opts.timeout);
