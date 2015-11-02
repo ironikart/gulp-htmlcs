@@ -18,7 +18,8 @@ module.exports = function(opts) {
         ignoreSSL:   true,
         webSecurity: false,
         standard:    'WCAG2AA',
-        verbose:     false
+        verbose:     false,
+        timeout:     60
     }, opts);
 
     return through.obj(function(file, enc, next) {
@@ -38,13 +39,12 @@ module.exports = function(opts) {
         var child = spawn(phantomCLI, args);
         var output = '';
 
-        var timeout = 60;
         setTimeout(function() {
             if (running) {
                 gutil.log(chalk.red('HTMLCS timeout ('+timeout+' seconds)'), file.path);
                 child.kill();
             }
-        }, timeout*1000);
+        }, opts.timeout*1000);
 
         child.stdout.on('data', function(data) {
             if (opts.verbose) {
