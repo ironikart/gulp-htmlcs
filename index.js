@@ -96,7 +96,7 @@ module.exports.reporter = function(opts) {
     return through.obj(function(file, enc, next) {
         var summary = {};
 
-        if (!file.htmlcs.report) {
+        if (!file.htmlcs || !file.htmlcs.report) {
             this.push(file);
             return next();
         }
