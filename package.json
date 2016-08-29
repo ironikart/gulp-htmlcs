@@ -1,7 +1,7 @@
 {
   "name": "gulp-htmlcs",
   "version": "0.0.2",
-  "description": "Gulp plugin for HTML Code Sniffer",
+  "description": "Gulp plugin for HTML Code Sniffer. Detects violations of a defined coding standard including WCAG 2.0 (A, AA and AAA) and Section 308.",
   "main": "index.js",
   "scripts": {
     "test": "mocha --reporter spec"
@@ -18,18 +18,18 @@
     "htmlcs"
   ],
   "author": "Anthony Barnes",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/ironikart/gulp-htmlcs/issues"
   },
   "homepage": "https://github.com/ironikart/gulp-htmlcs#readme",
   "dependencies": {
-    "HTML_CodeSniffer": "git+https://github.com/squizlabs/HTML_CodeSniffer.git",
-    "chalk": "^1.1.0",
-    "gulp-util": "^3.0.6",
+    "HTML_CodeSniffer": "git+https://github.com/squizlabs/HTML_CodeSniffer.git#2.0.7",
+    "chalk": "^1.1.3",
+    "gulp-util": "^3.0.7",
     "merge": "^1.2.0",
-    "phantomjs": "^1.9.17",
-    "through2": "^2.0.0"
+    "phantomjs": "^1.9.20",
+    "through2": "^2.0.1"
   },
   "devDependencies": {
     "chai": "^3.2.0",
