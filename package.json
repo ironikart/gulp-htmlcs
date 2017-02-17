@@ -1,6 +1,6 @@
 {
   "name": "gulp-htmlcs",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Gulp plugin for HTML Code Sniffer. Detects violations of a defined coding standard including WCAG 2.0 (A, AA and AAA) and Section 308.",
   "main": "index.js",
   "scripts": {
